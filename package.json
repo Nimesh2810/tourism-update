@@ -26,8 +26,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    
-    "start": "node api/server.js"  ,
+    "start": "concurrently  \"npm run client\" \"npm run server\"",
     "server": "node src/api/server.js",
     "client": "react-scripts start",
     "build": "react-scripts build",
