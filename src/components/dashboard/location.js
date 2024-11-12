@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import Slider from "react-slick";
 import { useNavigate } from "react-router-dom";
 import "../../index.css";
+import { PropagateLoader } from "react-spinners";
 
 const Location = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const Location = () => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(
-          `http://tourism-update-api.vercel.app/loadLocation/${id}`
+          `http://localhost:5000/loadLocation/${id}`
         );
         setLocation(response.data);
       } catch (error) {
@@ -35,7 +36,7 @@ const Location = () => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(
-          `http://tourism-update-api.vercel.app/loadByDistrictsLocation/${districts}`
+          `http://localhost:5000/loadByDistrictsLocation/${districts}`
         );
         setSameLocation(response.data);
       } catch (error) {
@@ -49,10 +50,11 @@ const Location = () => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
     responsive: [
       {
         breakpoint: 1024,
@@ -80,7 +82,9 @@ const Location = () => {
     ],
   };
 
-  if (!location) return <div>Loading...</div>;
+  if (!location) return <div className="flex justify-center items-center w-full mt-96">
+  <PropagateLoader />
+</div>
 
   return (
     <>
@@ -177,7 +181,7 @@ const Location = () => {
                           <button
                             onClick={() => {
                               navigate(`/location/${location.id}`);
-                              window.scrollTo(10,200);
+                              window.location.reload();
                             }}
                           >
                             See More...

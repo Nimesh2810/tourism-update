@@ -16,7 +16,7 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await axios.get("http://tourism-update-api.vercel.app/location");
+        const response = await axios.get("http://localhost:5000/location");
         setLocations(response.data);
       } catch (error) {
         console.error("Error fetching locations:", error);
