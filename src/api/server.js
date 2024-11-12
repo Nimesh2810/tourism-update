@@ -108,18 +108,19 @@ app.get('/loadLocation/:id', async (req, res) => {
     }
 });
 
-app.get('/loadByDistrictsLocation/:districts', async (req, res) => {
-    const {districts } = req.params; 
-    const query = `SELECT * FROM location WHERE districts = ?`;
-    
+app.get('/loadByDistrictsLocation/:districts/:locations', async (req, res) => {
+    const { districts, locations } = req.params;
+    const query = `SELECT * FROM location WHERE districts = ? AND location NOT LIKE ?`;
+
     try {
-        const [data] = await db.query(query, [districts]); 
+        const [data] = await db.query(query, [districts, `%${locations}%`]);
         res.json(data);
     } catch (error) {
         console.error("Error fetching details:", error);
         res.status(500).json({ message: "Failed to fetch details" });
     }
 });
+
 
 app.get('/admin', verifyToken, (req, res) => {
     res.json({ message: "Welcome to the Admin Panel" });

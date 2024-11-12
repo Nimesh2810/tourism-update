@@ -11,7 +11,26 @@ const Location = () => {
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [districts, setDistricts] = useState("");
+  const [locations, setLocations] = useState("");
   const [sameLocation, setSameLocation] = useState("");
+  const settings = {
+    dots: false,
+    infinite: true,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -28,15 +47,16 @@ const Location = () => {
     fetchLocation();
   }, [id]);
 
-  const isDistricts = (district) => {
+  const isDistricts = (district, location) => {
     setDistricts(district);
+    setLocations(location);
   };
 
   useEffect(() => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/loadByDistrictsLocation/${districts}`
+          `http://localhost:5000/loadByDistrictsLocation/${districts}/${locations}`
         );
         setSameLocation(response.data);
       } catch (error) {
@@ -45,46 +65,17 @@ const Location = () => {
     };
 
     fetchLocation();
-  }, [districts]);
+  }, [districts, locations]);
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2000,
-    pauseOnHover: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          infinite: true,
-          dots: false,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
 
-  if (!location) return <div className="flex justify-center items-center w-full mt-96">
-  <PropagateLoader />
-</div>
+
+  if (!location)
+    return (
+      <div className="flex justify-center items-center w-full mt-96">
+        <PropagateLoader />
+      </div>
+    );
+
 
   return (
     <>
@@ -93,7 +84,7 @@ const Location = () => {
           <div
             className="w-full"
             key={index}
-            onLoad={() => isDistricts(location.districts)}
+            onLoad={() => isDistricts(location.districts, location.location)}
           >
             <div
               className="item flex-shrink-0 w-full h-full bg-cover bg-center"
@@ -104,7 +95,11 @@ const Location = () => {
             ></div>
             <div className="lg:px-20">
               <div className="flex ml-12 cursor-pointer py-3">
-                <a href="/">Home&nbsp;&nbsp; </a>
+                <a
+                  href="/"
+                >
+                  Home&nbsp;&nbsp;{" "}
+                </a>
                 <span>&#10148; &nbsp;{location.location}</span>
               </div>
               <div className="lg:flex relative lg:flex-row">
@@ -153,7 +148,7 @@ const Location = () => {
             </div>
           </div>
         ))}
-        {sameLocation && (
+        {sameLocation.length !== 0 && (
           <>
             <div className="lg:px-28 p-5 ml-4 slider-container ">
               <span className="lg:text-2xl text-xl font-bold mt-8 ">

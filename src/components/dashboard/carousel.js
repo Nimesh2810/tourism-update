@@ -28,21 +28,22 @@ const Carousel = () => {
     }
 
     setTimeout(() => {
-      carouselRef.current.classList.remove("next", "prev");
+      carouselRef.current?.classList.remove("next", "prev");
     }, timeRunning);
   };
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/location");
-        setLocations(response.data);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
-    fetchLocations();
-  }, []);
+useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/location");
+      setLocations(response.data);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+  fetchLocations();
+}, []);
+
 
   useEffect(() => {
     if (locations.length > 0) {
@@ -58,9 +59,9 @@ const Carousel = () => {
   return (
     <section
       id="location"
-      className=" w-screen h-screen -mt-12 overflow-hidden relative "
+      className="w-screen h-screen -mt-12 overflow-hidden relative"
     >
-      <div ref={carouselRef} className="carousel ">
+      <div ref={carouselRef} className="carousel">
         <div ref={listRef} className="list">
           {locations.map((location, index) => (
             <div
@@ -68,21 +69,23 @@ const Carousel = () => {
               className="item flex-shrink-0 w-full h-full bg-cover bg-center"
               style={{ backgroundImage: `url(${location.image})` }}
             >
-              <div className="content h-3/5 ">
-                <div className="title ">{location.location}</div>
+              <div className="content h-3/5">
+                <div className="title">{location.location}</div>
                 <p className="des text-base mb-4 line-clamp-5">
                   {location.description}
                 </p>
                 <div className="btn">
-                <button onClick={() => navigate(`/location/${location.id}`)}>See More...</button>
+                  <button onClick={() => navigate(`/location/${location.id}`)}>
+                    See More...
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="arrows ">
-        <button onClick={() => showSlider("prev")} className="prev">
+        <div className="arrows">
+          <button onClick={() => showSlider("prev")} className="prev">
             &lt;
           </button>
           <button onClick={() => showSlider("next")} className="next">
