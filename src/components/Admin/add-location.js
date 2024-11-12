@@ -38,7 +38,7 @@ const AddLocation = ({ isOpen, onClose }) => {
   useEffect(() => {
     const fetchDistricts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/districts");
+        const response = await axios.get("http://tourism-update-api.vercel.app/districts");
         setDistricts(response.data);
       } catch (error) {
         console.error("Error fetching districts:", error);

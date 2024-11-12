@@ -28,7 +28,7 @@ const Login = () => {
     setLoading(true);
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', { username, password });
+      const response = await axios.post('http://tourism-update-api.vercel.app/login', { username, password });
       localStorage.setItem('token', response.data.token);
       setLoading(false);
       toast("success","Login successful!");

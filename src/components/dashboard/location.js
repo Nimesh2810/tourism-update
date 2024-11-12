@@ -16,7 +16,7 @@ const Location = () => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/loadLocation/${id}`
+          `http://tourism-update-api.vercel.app/loadLocation/${id}`
         );
         setLocation(response.data);
       } catch (error) {
@@ -35,7 +35,7 @@ const Location = () => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/loadByDistrictsLocation/${districts}`
+          `http://tourism-update-api.vercel.app/loadByDistrictsLocation/${districts}`
         );
         setSameLocation(response.data);
       } catch (error) {
