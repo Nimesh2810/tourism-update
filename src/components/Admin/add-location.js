@@ -126,6 +126,7 @@ const AddLocation = ({ isOpen, onClose, formMode, locationData }) => {
 
       setLoading(false);
       onClose();
+      window.location.reload();
     } catch (error) {
       toast("error", "Failed to save location.");
       console.error("Error saving location:", error);
