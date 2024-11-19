@@ -4,9 +4,11 @@ import { MdAddLocationAlt } from "react-icons/md";
 import { IoIosMore } from "react-icons/io";
 import Logo from "../../assets/logo.png";
 import LocationModal from "./add-location";
+import DeleteConfirmationModal from "./delete-conform";
 
 const AdminPanel = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
   const [locations, setLocations] = useState([]);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
   const [formMode, setFormMode] = useState('');
@@ -23,6 +25,13 @@ const AdminPanel = () => {
     setFormMode("edit");
     setCurrentLocationData(location);
     setShowModal(true);
+    toggleMenu(null);
+  };
+
+  const openDeleteModal = (location) => {
+    setCurrentLocationData(location.id);
+    setShowModalDelete(true);
+    toggleMenu(null);
   };
 
   useEffect(() => {
@@ -37,20 +46,6 @@ const AdminPanel = () => {
     fetchLocations();
   }, []);
 
-  const removeLocation = async (id) => {
-    window.location.reload();
-    try {
-      const response = await axios.delete(
-        `http://localhost:5000/locationRemove/${id}`
-      );
-
-      setActiveMenuIndex(null);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching locations Remove:", error);
-    }
-  };
-
   const toggleMenu = (index) => {
     setActiveMenuIndex(activeMenuIndex === index ? null : index);
   };
@@ -62,7 +57,12 @@ const AdminPanel = () => {
         onClose={() => setShowModal(false)}
         formMode={formMode}
         locationData={currentLocationData}
-        // refreshLocations={fetchLocations}
+      />
+
+      <DeleteConfirmationModal
+       isOpen={showModalDelete}
+       onClose={() => setShowModalDelete(false)}
+       locationData={currentLocationData}
       />
       <div className="w-screen  overflow-x-hidden relative">
         <div className="flex p-5">
@@ -121,7 +121,7 @@ const AdminPanel = () => {
                   </span>
                   <span
                     className="cursor-pointer font-medium"
-                    onClick={() => removeLocation(location.id)}
+                    onClick={() => openDeleteModal(location)}
                   >
                     Remove
                   </span>
