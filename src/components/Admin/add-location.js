@@ -38,7 +38,7 @@ const AddLocation = ({ isOpen, onClose, formMode, locationData }) => {
   useEffect(() => {
     if (formMode === "edit" && locationData) {
       setLocation(locationData.location);
-      setDistrict(locationData.district);
+      setDistrict(locationData.districts);
       setHistory(locationData.history);
       setDescription(locationData.description);
       setMap(locationData.map);
@@ -259,7 +259,13 @@ const AddLocation = ({ isOpen, onClose, formMode, locationData }) => {
                 required
               />
               {formMode === "edit" ? (
-                <iframe src={map} frameborder="0"></iframe>
+                <iframe
+                  src={map}
+                  frameborder="0"
+                  title={location.location}
+                  allowFullScreen
+                  loading="lazy"
+                ></iframe>
               ) : (
                 <></>
               )}

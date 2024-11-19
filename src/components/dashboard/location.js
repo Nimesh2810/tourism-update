@@ -102,7 +102,7 @@ const Location = () => {
                 </a>
                 <span>&#10148; &nbsp;{location.location}</span>
               </div>
-              <div className="lg:flex relative lg:flex-row">
+              <div className="lg:flex relative lg:flex-row cursor-pointer">
                 <div className="p-10 lg:w-1/2 w-screen flex flex-col ">
                   <span className="lg:text-5xl  text-3xl font-bold ">
                     {location.location}

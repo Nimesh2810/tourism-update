@@ -84,10 +84,10 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        <div className="mt-3 mx-5 space-y-4">
+        <div className="space-y-4 p-6">
           {locations.map((location, index) => (
             <div
-              className=" flex p-4 bg-gray-200 rounded-lg shadow-md w-full relative"
+              className=" flex p-4 bg-gray-200 rounded-lg shadow-md w-full relative cursor-pointer"
               key={index}
             >
               <div className="flex-none w-auto ">{index + 1}.&nbsp;</div>
