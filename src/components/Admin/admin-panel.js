@@ -9,9 +9,21 @@ const AdminPanel = () => {
   const [showModal, setShowModal] = useState(false);
   const [locations, setLocations] = useState([]);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null);
+  const [formMode, setFormMode] = useState('');
+  const [currentLocationData, setCurrentLocationData] = useState(null);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+
+  const openAddModal = () => {
+    setFormMode("add");
+    setCurrentLocationData(null);
+    setShowModal(true);
+  };
+
+  const openEditModal = (location) => {
+    setFormMode("edit");
+    setCurrentLocationData(location);
+    setShowModal(true);
+  };
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -25,14 +37,34 @@ const AdminPanel = () => {
     fetchLocations();
   }, []);
 
+  const removeLocation = async (id) => {
+    window.location.reload();
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/locationRemove/${id}`
+      );
+
+      setActiveMenuIndex(null);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching locations Remove:", error);
+    }
+  };
+
   const toggleMenu = (index) => {
     setActiveMenuIndex(activeMenuIndex === index ? null : index);
   };
 
   return (
     <>
-      <LocationModal isOpen={showModal} onClose={closeModal} />
-      <div className="w-screen h-screen overflow-x-hidden relative">
+      <LocationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        formMode={formMode}
+        locationData={currentLocationData}
+        // refreshLocations={fetchLocations}
+      />
+      <div className="w-screen  overflow-x-hidden relative">
         <div className="flex p-5">
           <img
             src={Logo}
@@ -45,7 +77,7 @@ const AdminPanel = () => {
           <div className="ml-auto">
             <button
               className="bg-green-400 hover:bg-green-700 border-none rounded-lg text-white p-2 text-sm md:text-lg mt-2 flex items-center"
-              onClick={openModal}
+              onClick={openAddModal}
             >
               <MdAddLocationAlt className="mr-2" /> Add Location
             </button>
@@ -59,8 +91,11 @@ const AdminPanel = () => {
               key={index}
             >
               <div className="flex-none w-auto ">{index + 1}.&nbsp;</div>
-              <div className="flex-none md:w-3/12  lg:w-2/12">{location.location} </div>
-              <div className="truncate px-1 w-screen flex-grow ">:&nbsp;
+              <div className="flex-none md:w-3/12  lg:w-2/12">
+                {location.location}{" "}
+              </div>
+              <div className="truncate px-1 w-screen flex-grow ">
+                :&nbsp;
                 {location.description}&nbsp;
               </div>
               <button
@@ -71,17 +106,22 @@ const AdminPanel = () => {
               </button>
 
               {activeMenuIndex === index && (
-                
-                <div class="flex flex-col absolute  md:right-1 right-3 z-10 mt-6 p-2 origin-top-right rounded-md bg-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none " role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                <div
+                  class="flex flex-col absolute  md:right-1 right-3 z-10 mt-6 p-2 origin-top-right rounded-md bg-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none "
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="menu-button"
+                  tabindex="-1"
+                >
                   <span
                     className="cursor-pointer font-medium "
-                    onClick={() => setActiveMenuIndex(null)}
+                    onClick={() => openEditModal(location)}
                   >
                     Edit
                   </span>
                   <span
                     className="cursor-pointer font-medium"
-                    onClick={() => setActiveMenuIndex(null)}
+                    onClick={() => removeLocation(location.id)}
                   >
                     Remove
                   </span>

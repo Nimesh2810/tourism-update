@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "../../index.css";
 
-const AddLocation = ({ isOpen, onClose }) => {
+const AddLocation = ({ isOpen, onClose, formMode, locationData }) => {
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState("");
   const [district, setDistrict] = useState("");
@@ -36,6 +36,26 @@ const AddLocation = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
+    if (formMode === "edit" && locationData) {
+      setLocation(locationData.location);
+      setDistrict(locationData.district);
+      setHistory(locationData.history);
+      setDescription(locationData.description);
+      setMap(locationData.map);
+      setTips(locationData.tips);
+      setImage(locationData.image);
+    } else {
+      setLocation("");
+      setDistrict("");
+      setHistory("");
+      setDescription("");
+      setMap("");
+      setTips("");
+      setImage(null);
+    }
+  }, [formMode, locationData]);
+
+  useEffect(() => {
     const fetchDistricts = async () => {
       try {
         const response = await axios.get("http://localhost:5000/districts");
@@ -56,37 +76,60 @@ const AddLocation = ({ isOpen, onClose }) => {
     setLoading(true);
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("file", images);
-    formData.append("upload_preset", UPLOAD_PRESET);
+    let imageUrl = locationData?.image;
+    if (images) {
+      const formData = new FormData();
+      formData.append("file", images);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      try {
+        const response = await axios.post(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          formData
+        );
+        imageUrl = response.data.secure_url;
+      } catch (error) {
+        toast("warning", "Image upload failed. Please try again.");
+        console.error("Image upload error:", error);
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        formData
-      );
-      try {
+      if (formMode === "add") {
         await axios.post("http://localhost:5000/locations", {
           location,
           history,
           description,
           map,
           tips,
-          image: response.data.secure_url,
+          image: imageUrl,
           districts: district,
         });
-        setLoading(false);
-        toast("success", "Login successful!");
-        window.location.reload();
-      } catch (error) {
-        toast("warning", "Location Add failed. Please try again.");
-        console.error("Error ", error);
-        setLoading(false);
+        toast("success", "Location added successfully!");
+      } else if (formMode === "edit" && locationData?.id) {
+        await axios.put(
+          `http://localhost:5000/locationsEdit/${locationData.id}`,
+          {
+            location,
+            history,
+            description,
+            map,
+            tips,
+            image: imageUrl,
+            districts: district,
+          }
+        );
+        toast("success", "Location updated successfully!");
       }
-    } catch (error) {
+
       setLoading(false);
-      toast("warning", "Upload failed. Please try again.");
-      console.error("Error uploading the image", error);
+      onClose();
+    } catch (error) {
+      toast("error", "Failed to save location.");
+      console.error("Error saving location:", error);
+      setLoading(false);
     }
   };
 
@@ -95,7 +138,9 @@ const AddLocation = ({ isOpen, onClose }) => {
     <form onSubmit={handleAddLocation}>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-lg md:max-w-2xl mx-4 h-full max-h-screen md:max-h-[90vh] overflow-y-auto flex flex-col">
-          <h2 className="text-2xl font-semibold mb-4">Add New Location</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            {formMode === "add" ? "Add New Location" : "Edit Location"}
+          </h2>
 
           <div className="lg:flex space-y-4 lg:space-y-0 lg:space-x-4 w-full ">
             <div className="relative w-full lg:w-1/2">
@@ -125,7 +170,7 @@ const AddLocation = ({ isOpen, onClose }) => {
               </label>
               <select
                 id="district"
-                className=" p-2 mb-4  block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 h-10"
+                className="p-2 mb-4 block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6 h-10 "
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
                 required
@@ -150,7 +195,7 @@ const AddLocation = ({ isOpen, onClose }) => {
               </label>
               <textarea
                 id="history"
-                rows={4}
+                rows={5}
                 placeholder="History of Place"
                 className="p-2 mb-4 block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                 value={history}
@@ -166,7 +211,7 @@ const AddLocation = ({ isOpen, onClose }) => {
               </label>
               <textarea
                 id="description"
-                rows={4}
+                rows={5}
                 placeholder="Description"
                 className="p-2 mb-4 block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                 value={description}
@@ -176,25 +221,8 @@ const AddLocation = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className="lg:flex space-y-4 lg:space-y-0 lg:space-x-4 w-full ">
-            <div className="relative w-full lg:w-1/2">
-              <label
-                htmlFor="map"
-                className="block text-sm font-medium text-gray-900"
-              >
-                Maps Embed Url
-              </label>
-              <input
-                id="map"
-                type="text"
-                placeholder="Maps Embed Url"
-                className="p-2 mb-4 block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
-                value={map}
-                onChange={(e) => setMap(e.target.value)}
-                required
-              />
-            </div>
-            <div className="relative w-full lg:w-1/2">
+          <div className="lg:flex space-y-4 lg:space-y-0 lg:space-x-4 w-full mb-4 ">
+            <div className="relative w-full ">
               <label
                 htmlFor="tips"
                 className="block text-sm font-medium text-gray-900"
@@ -212,20 +240,50 @@ const AddLocation = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className="lg:-mt-7 mb-2 ">
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-900"
-            >
-              Upload Image
-            </label>
-            <input
-              type="file"
-              id="image"
-              accept="image/*"
-              onChange={handleImageChange}
-              className=" block w-1/2 text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
-            />
+          <div className="lg:flex space-y-4 lg:space-y-0 lg:space-x-4 w-full mb-8">
+            <div className="relative w-full lg:w-1/2">
+              <label
+                htmlFor="map"
+                className="block text-sm font-medium text-gray-900"
+              >
+                Maps Embed Url
+              </label>
+              <input
+                id="map"
+                type="text"
+                placeholder="Maps Embed Url"
+                className="p-2 mb-4 block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                value={map}
+                onChange={(e) => setMap(e.target.value)}
+                required
+              />
+              {formMode === "edit" ? (
+                <iframe src={map} frameborder="0"></iframe>
+              ) : (
+                <></>
+              )}
+            </div>
+
+            <div className="relative w-full lg:w-1/2">
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-900"
+              >
+                Upload Image
+              </label>
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={handleImageChange}
+                className=" block  text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
+              />
+              {formMode === "edit" ? (
+                <img className="w-[300px] h-[200px]" src={images} alt="img" />
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-center space-x-2 lg:mt-11">
@@ -244,9 +302,11 @@ const AddLocation = ({ isOpen, onClose }) => {
               }`}
             >
               {loading ? (
-                <div className=" w-full  bg-green-500 text-white rounded-xl hover:bg-green-700 spinner-border animate-spin inline-block  h-4 border-4 "></div>
-              ) : (
+                <div className="spinner-border animate-spin inline-block h-4 border-4"></div>
+              ) : formMode === "add" ? (
                 "Save"
+              ) : (
+                "Update"
               )}
             </button>
           </div>
