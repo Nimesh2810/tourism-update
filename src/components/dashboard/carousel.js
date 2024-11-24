@@ -35,7 +35,7 @@ const Carousel = () => {
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/location");
+      const response = await axios.get("https://6743627cf74a11e26cd14482--visitparadise.netlify.app/location");
       setLocations(response.data);
     } catch (error) {
       console.error("Error fetching locations:", error);
@@ -71,7 +71,7 @@ useEffect(() => {
             >
               <div className="content h-3/5">
                 <div className="title">{location.location}</div>
-                <p className="des text-base mb-4 line-clamp-5">
+                <p className="des text-base mb-4 line-clamp-5 text-gray-100">
                   {location.description}
                 </p>
                 <div className="btn">

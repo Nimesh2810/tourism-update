@@ -5,6 +5,7 @@ import Slider from "react-slick";
 import { useNavigate } from "react-router-dom";
 import "../../index.css";
 import { PropagateLoader } from "react-spinners";
+import Bg from "../../assets/bg.jpg";
 
 const Location = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ const Location = () => {
     slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 3000,
     pauseOnHover: true,
     responsive: [
       {
@@ -67,15 +68,12 @@ const Location = () => {
     fetchLocation();
   }, [districts, locations]);
 
-
-
   if (!location)
     return (
       <div className="flex justify-center items-center w-full mt-96">
         <PropagateLoader />
       </div>
     );
-
 
   return (
     <>
@@ -95,11 +93,7 @@ const Location = () => {
             ></div>
             <div className="lg:px-20">
               <div className="flex ml-12 cursor-pointer py-3">
-                <a
-                  href="/"
-                >
-                  Home&nbsp;&nbsp;{" "}
-                </a>
+                <a href="/">Home&nbsp;&nbsp; </a>
                 <span>&#10148; &nbsp;{location.location}</span>
               </div>
               <div className="lg:flex relative lg:flex-row cursor-pointer">
@@ -154,39 +148,72 @@ const Location = () => {
               <span className="lg:text-2xl text-xl font-bold mt-8 ">
                 Other Attractions to visit in this Area
               </span>
-              <div className="md:w-3/4 m-auto w-full">
-                <div className="mt-10">
-                  <Slider {...settings}>
-                    {sameLocation.map((location, index) => (
-                      <div
-                        key={index}
-                        className="bg-white h-[450px] text-black rounded-xl"
-                      >
-                        <div className="h-56 flex justify-center items-center rounded-t-xl">
-                          <img
-                            src={location.image}
-                            alt=""
-                            className="h-full w-full rounded-t-xl"
-                          />
-                        </div>
-                        <div className="flex flex-col items-center justify-center p-4 gap-4 bg-gray-200 rounded-b-xl">
-                          <span className="font-semibold text-xl">
-                            {location.location}
-                          </span>
-                          <button
-                            onClick={() => {
-                              navigate(`/location/${location.id}`);
-                              window.location.reload();
-                            }}
-                          >
-                            See More...
-                          </button>
-                        </div>
+              {sameLocation.length <= 2 ? (
+                <div className="flex justify-center w-full mt-10 ">
+                <div className=" grid gap-4 md:grid-cols-2 md:w-[80%] w-full">
+                  {sameLocation.map((location, index) => (
+                    <div
+                      key={index}
+                      className="bg-white  text-black rounded-xl w-full"
+                    >
+                      <div className="h-56 flex justify-center items-center rounded-t-xl">
+                        <img
+                          src={location.image}
+                          alt="img"
+                          className="h-full w-full rounded-t-xl"
+                        />
                       </div>
-                    ))}
-                  </Slider>
+                      <div className="flex flex-col items-center justify-center p-4 gap-4 bg-gray-200 rounded-b-xl">
+                        <span className="font-semibold text-xl">
+                          {location.location}
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigate(`/location/${location.id}`);
+                            window.location.reload();
+                          }}
+                        >
+                          See More...
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  </div>
                 </div>
-              </div>
+              
+              ) : (
+                <div className="md:w-3/4 m-auto w-full mt-10">
+                    <Slider {...settings}>
+                      {sameLocation.map((location, index) => (
+                        <div
+                          key={index}
+                          className="bg-white  text-black rounded-xl"
+                        >
+                          <div className="h-56 flex justify-center items-center rounded-t-xl">
+                            <img
+                              src={location.image}
+                              alt=""
+                              className="h-full w-full rounded-t-xl"
+                            />
+                          </div>
+                          <div className="flex flex-col items-center justify-center p-4 gap-4 bg-gray-200 rounded-b-xl">
+                            <span className="font-semibold text-xl">
+                              {location.location}
+                            </span>
+                            <button
+                              onClick={() => {
+                                navigate(`/location/${location.id}`);
+                                window.location.reload();
+                              }}
+                            >
+                              See More...
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </Slider>
+                </div>
+              )}
             </div>
           </>
         )}

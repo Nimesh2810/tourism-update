@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdMenu } from "react-icons/io";
 import "../../index.css";
 import { Link } from 'react-scroll';
@@ -6,9 +6,33 @@ import Logo from "../../assets/logo.png"
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(true); 
+  const [lastScrollPos, setLastScrollPos] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollPos = window.pageYOffset;
+
+      if (currentScrollPos > lastScrollPos && currentScrollPos > 50) {
+        setIsScrollingUp(false);
+      } else {
+        setIsScrollingUp(true);
+      }
+
+      setLastScrollPos(currentScrollPos);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollPos]);
 
   return (
-    <nav className="absolute h-20 w-full max-w-6xl mx-auto px-8 flex items-center  justify-start  gap-32   bg-transparent top-0 z-30 font-bold "  >
+    <nav className={`-mt-20 g-transparent  transition-transform duration-1000  bg-transparent h-20 w-full max-w-6xl mx-auto px-8 flex items-center justify-between sticky top-0 z-30 ${
+      isScrollingUp ? "translate-y-0" : "-translate-y-full"
+    }`} >
       <img src={Logo} alt="Logo" className="h-12 w-12 object-fill " />
 
       {/* Desktop Menu */}
